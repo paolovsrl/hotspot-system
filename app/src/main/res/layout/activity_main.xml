@@ -7,23 +7,33 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/start_btn_deprecated"
+        android:id="@+id/start_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="Start with deprecated"
+        android:text="Start"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/start_btn_new"
+        android:id="@+id/stop_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="Start API 30"
+        android:text="Stop"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/start_btn_deprecated" />
+        app:layout_constraintTop_toBottomOf="@+id/start_btn" />
+
+    <Button
+        android:id="@+id/check_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Check"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stop_btn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

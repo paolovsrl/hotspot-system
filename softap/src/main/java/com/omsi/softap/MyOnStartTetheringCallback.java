@@ -1,4 +1,4 @@
-package com.omsi.softaptest;
+package com.omsi.softap;
 
 public abstract class MyOnStartTetheringCallback {
         /**

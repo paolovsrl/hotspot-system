@@ -18,10 +18,16 @@ android {
 
     signingConfigs {
         debug {
-            storeFile file("D:\\\\AndroidStudioProjects\\\\SIGNING\\\\platform.keystore")
-            storePassword "123456"
-            keyAlias "platform"
-            keyPassword "123456"
+            storeFile file(getSecretKeys()['RELEASE_SYS_STORE_FILE'])
+            storePassword getSecretKeys()['RELEASE_SYS_STORE_PASSWORD']
+            keyAlias getSecretKeys()['RELEASE_SYS_KEY_ALIAS']
+            keyPassword getSecretKeys()['RELEASE_SYS_KEY_PASSWORD']
+        }
+        release {
+            storeFile file(getSecretKeys()['RELEASE_SYS_STORE_FILE'])
+            storePassword getSecretKeys()['RELEASE_SYS_STORE_PASSWORD']
+            keyAlias getSecretKeys()['RELEASE_SYS_KEY_ALIAS']
+            keyPassword getSecretKeys()['RELEASE_SYS_KEY_PASSWORD']
         }
     }
 
@@ -42,6 +48,14 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'com.linkedin.dexmaker:dexmaker:2.25.0'
+   // implementation 'com.linkedin.dexmaker:dexmaker:2.25.0'
+    api project(':SoftAP')
+}
 
+
+def getSecretKeys(){
+    def keyFile = file("D:\\\\AndroidStudioProjects\\\\SIGNING\\\\data.properties")
+    def secretKeys = new Properties()
+    secretKeys.load(new FileInputStream(keyFile))
+    return secretKeys
 }

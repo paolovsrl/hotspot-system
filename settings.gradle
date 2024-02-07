@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "SoftApTest"
 include ':app'
+include ':SoftAP'

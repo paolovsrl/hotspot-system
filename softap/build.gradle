@@ -1,0 +1,64 @@
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+}
+
+android {
+    namespace 'com.omsi.softap'
+    compileSdk 34
+
+    defaultConfig {
+        minSdk 23
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    publishing {
+        singleVariant('release') {
+            // if you don't want sources/javadoc, remove these lines
+            //withSourcesJar()
+            withJavadocJar()
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    implementation 'com.linkedin.dexmaker:dexmaker:2.25.0'  //Do not update this dependency
+}
+
+
+//Publishing to a local Maven Repository
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId 'com.android.lib'
+                artifactId 'softap'
+                version '1.0'
+                from components.getByName('release')
+            }
+        }
+
+        repositories {
+            maven {
+                name = 'myRepo'
+                //url = layout.buildDirectory.dir("repo")
+                url = "D:\\AndroidStudioProjects\\OMSI\\repo-public"
+            }
+        }
+    }
+}
