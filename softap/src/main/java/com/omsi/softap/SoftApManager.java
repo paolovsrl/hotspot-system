@@ -8,6 +8,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 
@@ -15,6 +16,7 @@ import com.android.dx.stock.ProxyBuilder;
 
 import java.io.File;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -37,11 +39,22 @@ public class SoftApManager {
      * Requires: android.permission.TETHER_PRIVILEGED, which is only granted to system apps.
      */
     public static int startSoftAp(Activity activity, String ssid, String password, boolean isOpen){
-        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R){
+
+
+
+        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            //Android 11
             return startWithAPI30(activity, ssid, password, isOpen);
+        }else if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P){
+            //android9
+            return startWithAPI28(activity, ssid, password, isOpen);
         } else{
+            //android6
             return startWithAPI23(activity, ssid, password, isOpen);
         }
+
+
+
     }
 
 
@@ -50,7 +63,10 @@ public class SoftApManager {
     public static int stopSoftAp(Activity activity){
         if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R){
             return stopWithAPI30(activity);
-        } else{
+        } else if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P){
+            //android9
+            return stopWithAPI28(activity);
+        }else{
             return stopWithAPI23(activity);
         }
     }
@@ -88,15 +104,81 @@ public class SoftApManager {
 
 
 
+    /*************API23*************************************************************************************/
+
+    public static int startWithAPI23(Activity activity, String ssid, String password, boolean isOpen){
+        if(!isOpen && ( password.length() < PSK_MIN_LEN || password.length() > PSK_MAX_LEN) || ssid==null || ssid.isEmpty()){
+            return INVALID_CONFIG;
+        }
+
+        //Configuration:
+        WifiConfiguration apConfig = new WifiConfiguration();
+        WifiManager mWifiManager = (WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        apConfig.SSID = ssid;
+        if (isOpen){
+            //apConfig.setSecurityParams(WifiConfiguration.SECURITY_TYPE_OPEN);
+            apConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+        } else{
+            apConfig.preSharedKey = password;
+            apConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK); //Default.
+        }
+        try {
+            Method setWifiApEnabled = mWifiManager.getClass().getMethod("setWifiApEnabled", WifiConfiguration.class, boolean.class);
+            boolean status = (boolean) setWifiApEnabled.invoke(mWifiManager, apConfig,true);
+            Log.d(TAG, "Enable AP - success? " + status);
+            if(!status)
+                return RESULT_FAILED;
+        } catch (Exception e) {
+            Log.e(TAG, "Error in enabling Hotspot");
+            e.printStackTrace();
+            return INVALID_CONFIG;
+        }
+
+
+           /* Method tether = mConnectivityManager.getClass().getDeclaredMethod("tether", String.class);
+            String iface = "wlan0";
+            int result = (int) tether.invoke(mConnectivityManager, iface);
+            //0=no error, 1=unknown iface, 2=service unavailable ... >2 not working
+            Log.d(TAG, "tether invoked with result: "+result);
+*/
+            //Wifi must be enabled to have 0 as returned value
+
+        return RESULT_OK;
+    }
+
+
+
+
+    public static  int stopWithAPI23(Activity activity) {
+
+        WifiManager mWifiManager = (WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiConfiguration apConfig = new WifiConfiguration();
+        try {
+            Method setWifiApEnabled = mWifiManager.getClass().getMethod("setWifiApEnabled", WifiConfiguration.class, boolean.class);
+            boolean status = (boolean) setWifiApEnabled.invoke(mWifiManager, apConfig,false);
+            Log.d(TAG, "Disable AP - success? " + status);
+            if(!status)
+                return RESULT_FAILED;
+
+        } catch (Exception e) {
+            Log.e(TAG, "stopTethering error: " + e.toString());
+            e.printStackTrace();
+            return RESULT_FAILED;
+        }
+
+        return RESULT_OK;
+    }
 
 
 
 
 
 
+
+    /*************API28*************************************************************************************/
 
     //Setting a password does not work!
-    public static int startWithAPI23(Activity activity, String ssid, String password, boolean isOpen){
+    public static int startWithAPI28(Activity activity, String ssid, String password, boolean isOpen){
         if(!isOpen && ( password.length() < PSK_MIN_LEN || password.length() > PSK_MAX_LEN) || ssid==null || ssid.isEmpty()){
             return INVALID_CONFIG;
         }
@@ -206,7 +288,7 @@ public class SoftApManager {
 
 
 
-    public static  int stopWithAPI23(Activity activity) {
+    public static  int stopWithAPI28(Activity activity) {
         ConnectivityManager mConnectivityManager;
         mConnectivityManager = (ConnectivityManager) activity.getApplicationContext().getSystemService(ConnectivityManager.class);
         try {

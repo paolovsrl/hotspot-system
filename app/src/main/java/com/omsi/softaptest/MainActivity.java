@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.stop_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SoftApManager.stopWithAPI30(MainActivity.this);
+                SoftApManager.stopSoftAp(MainActivity.this);
             }
         });
 
