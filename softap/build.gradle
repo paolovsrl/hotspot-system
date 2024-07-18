@@ -48,7 +48,7 @@ afterEvaluate {
             release(MavenPublication) {
                 groupId 'com.android.lib'
                 artifactId 'softap'
-                version '1.3'
+                version '1.4'
                 from components.getByName('release')
             }
         }
