@@ -36,8 +36,11 @@ android {
 }
 
 dependencies {
-    api 'com.linkedin.dexmaker:dexmaker:2.28.3'
-  //  api 'com.linkedin.dexmaker:dexmaker:2.25.0'
+   // api 'com.linkedin.dexmaker:dexmaker:2.28.3'
+    implementation 'androidx.core:core:1.9.0'
+    implementation project(':SoftAP:api23')
+    implementation project(':SoftAP:api28')
+    implementation project(':SoftAP:api30')
 }
 
 
@@ -48,7 +51,7 @@ afterEvaluate {
             release(MavenPublication) {
                 groupId 'com.android.lib'
                 artifactId 'softap'
-                version '1.4'
+                version '1.6'
                 from components.getByName('release')
             }
         }

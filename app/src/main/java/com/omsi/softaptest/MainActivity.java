@@ -4,6 +4,7 @@ import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -25,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         findViewById(R.id.start_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -32,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.stop_btn).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.stop_btn).setOnClickListener(new View.OnClickListener()   {
             @Override
             public void onClick(View view) {
                 SoftApManager.stopSoftAp(MainActivity.this);
@@ -106,10 +109,6 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     InputStream inputStream = assetManager.open("scrcpy-server.jar");
 
-
-                    Process p1 = Runtime.getRuntime().exec("touch /data/sk/tmp ");
-                    p1.waitFor();
-
                     File outputFile = new File("/data/sk/scrcpy-server.jar");
                    // outputFile.createNewFile();
                     FileOutputStream outputStream = new FileOutputStream(outputFile);
@@ -135,31 +134,29 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-    }
 
 
-    private void executeShellCmd(String cmd){
-        Process process = null;
-        BufferedReader bufferedReader = null;
-        StringBuilder output = new StringBuilder();
+        //ALL in ONE, for easy test by the customer:
+        findViewById(R.id.generic_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                findViewById(R.id.start_btn).performClick();
+                findViewById(R.id.enable_adb_btn).performClick();
+                findViewById(R.id.copy_library_btn).performClick();
 
-        File workingDirectory = new File("/data/local/tmp");
-        String[] environment = {"PATH=/system/bin"};
-
-        try {
-            process = Runtime.getRuntime().exec(cmd,  environment, workingDirectory);
-            bufferedReader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream()));
-            String line = "";
-            while((line = bufferedReader.readLine() )!= null){
-                output.append(line);
+                Toast.makeText(MainActivity.this, "DONE!", Toast.LENGTH_SHORT).show();
             }
-            process.waitFor();
-            Log.d(TAG, "Result: "+output.toString());
-
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        });
+/*
+        findViewById(R.id.start_btn).setVisibility(View.GONE);
+        findViewById(R.id.stop_btn).setVisibility(View.GONE);
+        findViewById(R.id.check_btn).setVisibility(View.GONE);
+        findViewById(R.id.enable_adb_btn).setVisibility(View.GONE);
+        findViewById(R.id.disable_adb_btn).setVisibility(View.GONE);
+        findViewById(R.id.copy_library_btn).setVisibility(View.GONE);*/
     }
+
+
+
 
 }

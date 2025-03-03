@@ -1,0 +1,24 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    namespace 'com.omsi.softap.api28'
+    compileSdk 28
+
+    defaultConfig {
+        minSdk 28
+        //noinspection ExpiredTargetSdkVersion needed for not showing @Deprecated
+        targetSdk 28
+    }
+
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    api 'com.linkedin.dexmaker:dexmaker:2.28.3'
+}
