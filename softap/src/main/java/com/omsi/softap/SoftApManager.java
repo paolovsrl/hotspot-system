@@ -14,9 +14,6 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.android.dx.stock.ProxyBuilder;
-import com.omsi.softap.api23.API23;
-import com.omsi.softap.api28.API28;
-import com.omsi.softap.api30.API30;
 
 import java.io.File;
 import java.lang.reflect.InvocationHandler;
