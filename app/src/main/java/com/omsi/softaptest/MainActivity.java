@@ -1,6 +1,7 @@
 package com.omsi.softaptest;
 
 import android.content.res.AssetManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,17 +56,24 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.enable_adb_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              try {
+                try {
+                    Log.d(TAG, "tcp port");
                     Process  p = Runtime.getRuntime().exec("setprop service.adb.tcp.port 5555 ");
-                  //  p.getOutputStream().write("ls -ll".getBytes());
+                    // p.getOutputStream().write("ls -ll".getBytes());
+                    p.waitFor();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        p.waitFor(5, TimeUnit.SECONDS);
+                    }
+                    p.getOutputStream().flush();
+                    Log.d(TAG, "stop adbd");
+                    p = Runtime.getRuntime().exec("setprop ctl.stop adbd");
+                    p.waitFor();
+                    p.getOutputStream().flush();
+
+                    Log.d(TAG, "start adbd");
+                    p = Runtime.getRuntime().exec(" setprop ctl.start adbd");
                     p.waitFor();
 
-                    p = Runtime.getRuntime().exec("stop adbd ");
-                    p.waitFor();
-
-
-                    p = Runtime.getRuntime().exec("start adbd ");
-                    p.waitFor();
 
                 } catch (IOException e) {
                     // Handle IOException (e.g., log the error)
@@ -85,11 +94,11 @@ public class MainActivity extends AppCompatActivity {
                     Process  p = Runtime.getRuntime().exec("setprop service.adb.tcp.port -1 ");
                     p.waitFor();
 
-                    p = Runtime.getRuntime().exec("stop adbd ");
+                    p = Runtime.getRuntime().exec("setprop ctl.stop adbd");
                     p.waitFor();
 
 
-                    p = Runtime.getRuntime().exec("start adbd ");
+                    p = Runtime.getRuntime().exec(" setprop ctl.start adbd");
                     p.waitFor();
 
                 } catch (IOException e) {
@@ -109,8 +118,20 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     InputStream inputStream = assetManager.open("scrcpy-server.jar");
 
-                    File outputFile = new File("/data/sk/scrcpy-server.jar");
-                   // outputFile.createNewFile();
+                    //SPRING10
+                    String pathName = "/data/sk/scrcpy-server.jar";
+                    //APOLLO10 pro has different filesystem configuration
+                    if(Build.MODEL.equals("QUALCOMM APOLLO10 PRO") || Build.MODEL.equals("APOLLO10 PRO"))
+                        pathName = "/data/ss/scrcpy-server.jar";
+                    //APOLLO2_12_PRO
+                    if(Build.MODEL.equals("APOLLO2_12_PRO"))
+                        pathName = "/data/ss/scrcpy-server.jar";
+
+                    Log.d(TAG, "pathName: " + pathName);
+
+                    File outputFile = new File(pathName);
+
+                    // outputFile.createNewFile();
                     FileOutputStream outputStream = new FileOutputStream(outputFile);
 
 
